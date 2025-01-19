@@ -1,0 +1,26 @@
+service:
+  name: nestjs-base
+  baseUrl: /api/nestjs-base
+  docsBaseUrl: /docs/nestjs-base
+  appVersion: 1.0.0
+
+server:
+  port: 3050
+  host: 127.0.0.1
+  hostname: 127.0.0.1:3050
+
+mongodb:
+  uri: mongodb://127.0.0.1:27017/nestjs-base
+
+pino:
+  level: debug
+  enabled: true
+  autoLogging: false # to disable the automatic "request completed" and "request errored" logging
+  redact:
+    enabled: true
+    censor: '******'
+    paths:
+      - req.headers["access-token"]
+
+logger:
+  enabled: false
