@@ -77,17 +77,20 @@ The project uses Jest for testing and mongodb-memory-server for an in-memory dat
 
 ## Project Structure
 
+\`\`\`
 nestjs-base/
 │── src/
-│ ├── modules/ # Feature modules
-│ ├── shared/ # Shared utilities/helpers
-│ ├── main.ts # Entry point
+│   ├── modules/       # Feature modules
+│   ├── shared/        # Shared utilities/helpers
+│   ├── main.ts        # Entry point
 │── config/
-│ ├── services/ # Microservices & third-party service configurations
-│ ├── custom-environment-variables.yaml # Env mapping
-│ ├── default.yaml # Default environment settings
-│── package.json # Project dependencies & scripts
-│── README.md # Project documentation
+│   ├── services/      # Microservices & third-party service configurations
+│   ├── custom-environment-variables.yaml  # Env mapping
+│   ├── default.yaml   # Default environment settings
+│── test/              # Test cases
+│── package.json       # Project dependencies & scripts
+│── README.md          # Project documentation
+\`\`\`
 
 ## Author
 
