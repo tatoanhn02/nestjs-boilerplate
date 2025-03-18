@@ -5,40 +5,47 @@ import { getCorrelationId } from '../../interceptors/logger.interceptor';
 import { tryParseJsonString } from './data.helper';
 
 enum LogLevel {
+  FATAL = 'FATAL',
   ERROR = 'ERROR',
+  WARN = 'WARN',
   INFO = 'INFO',
   DEBUG = 'DEBUG',
+  TRACE = 'TRACE',
 }
 
 const logger = pino(pinoConfig);
 
-const logLevelFunc = {
-  [LogLevel.ERROR]: logger.error,
-  [LogLevel.INFO]: logger.info,
-  [LogLevel.DEBUG]: logger.debug,
+const logMethods = {
+  [LogLevel.FATAL]: logger.fatal.bind(logger),
+  [LogLevel.ERROR]: logger.error.bind(logger),
+  [LogLevel.WARN]: logger.warn.bind(logger),
+  [LogLevel.INFO]: logger.info.bind(logger),
+  [LogLevel.DEBUG]: logger.debug.bind(logger),
+  [LogLevel.TRACE]: logger.trace.bind(logger),
 };
 
-type LogDetails = {
+interface LogDetails {
   message?: string;
-  data?;
+  data?: any;
   methodName?: string;
-};
+}
 
 const log = (logLevel: LogLevel, { data, message, methodName }: LogDetails) => {
   if (!PINO_ENABLED) return;
 
-  const logFunc = logLevelFunc[logLevel];
+  const logFunc = logMethods[logLevel];
   if (!logFunc) {
-    logger.fatal({}, `No log func for level ${logLevel}`);
+    logger.fatal({ level: logLevel }, 'Invalid log level specified');
     return;
   }
 
   const correlationId = getCorrelationId();
-  const correlationIdMsg = correlationId ? `[${correlationId}]` : '';
-  const methodNameMsg = methodName ? `[${methodName}]` : '';
-  const messageLog = correlationIdMsg + methodNameMsg + `: ${message}`;
 
-  logFunc.call(logger, { ...data, correlationId }, { message: messageLog });
+  const correlationIdMsg = '';
+  const methodNameMsg = methodName ? `[${methodName}]` : '';
+  const messageLog = `${correlationIdMsg}${methodNameMsg}${message ? `: ${message}` : ''}`;
+
+  logFunc({ ...data, correlationId }, messageLog);
 };
 
 export const infoLog = (
@@ -57,78 +64,114 @@ export const errorLog = (
   log(LogLevel.ERROR, { message, data, methodName });
 };
 
-export const httpRequestLog = (req) => {
-  const requestLog = {
+export const httpRequestLog = (req): void => {
+  if (!PINO_ENABLED) return;
+
+  const requestData = {
     correlationId: req.correlationId,
-    message: `HTTP Request`,
-    data: {
-      // clientIP: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+    method: req.method,
+    originalUri: req.originalUrl,
+    uri: req.url,
+    clientIP: req.headers['x-forwarded-for'] || req.connection?.remoteAddress,
+    referer: req.headers.referer,
+    userAgent: req.headers['user-agent'],
+    body: tryParseJsonString(req.body),
+    headers: req.headers,
+    timestamp: req.timestamp || Date.now(),
+  };
+
+  log(LogLevel.DEBUG, {
+    message: 'HTTP Request',
+    data: requestData,
+  });
+};
+
+export const httpResponseLog = (req, res): void => {
+  if (!PINO_ENABLED) return;
+
+  const startTime = req.timestamp || Date.now();
+  const chunks: Buffer[] = [];
+
+  // Set response headers
+  const correlationId = req.correlationId || getCorrelationId();
+  res.setHeader('x-request-id', correlationId);
+
+  // Save original methods
+  const originalWrite = res.write;
+  const originalEnd = res.end;
+
+  // Override write to capture response body
+  res.write = function (...args: any[]): boolean {
+    if (args[0]) {
+      chunks.push(Buffer.from(args[0]));
+    }
+    return originalWrite.apply(res, args);
+  };
+
+  // Override end to log response
+  res.end = function (...args: any[]): void {
+    // Capture final chunk if exists
+    if (args[0]) {
+      chunks.push(Buffer.from(args[0]));
+    }
+
+    const endTime = Date.now();
+    const processTime = `${endTime - startTime}ms`;
+    res.setHeader('x-process-time', processTime);
+
+    // Reconstruct body
+    let responseBody = '';
+    try {
+      responseBody = Buffer.concat(chunks).toString('utf8');
+      responseBody = tryParseJsonString(responseBody);
+    } catch (err) {
+      responseBody = '[Error parsing response body]';
+    }
+
+    // Log response details
+    const responseData = {
+      correlationId,
+      statusCode: res.statusCode,
       method: req.method,
       originalUri: req.originalUrl,
       uri: req.url,
-      // referer: req.headers.referer || '',
-      // userAgent: req.headers['user-agent'],
-      req: {
-        body: tryParseJsonString(req.body),
-        headers: req.headers,
-      },
-    },
+      processTime,
+      responseTime: endTime - startTime,
+      responseHeaders: res.getHeaders(),
+      responseBody: shouldLogResponseBody(req, res)
+        ? responseBody
+        : '[BODY OMITTED]',
+    };
+
+    log(LogLevel.DEBUG, {
+      message: `HTTP Response - ${processTime}`,
+      data: responseData,
+    });
+
+    // Call original end method
+    originalEnd.apply(res, args);
   };
-  log(LogLevel.DEBUG, requestLog);
 };
 
-export const httpResponseLog = (req, res) => {
-  const elapsedStart = req.timestamp ? req.timestamp : 0;
-  const elapsedEnd = Date.now();
-  const processTime = `${elapsedStart > 0 ? elapsedEnd - elapsedStart : 0}ms`;
-  res.setHeader('x-request-id', req.correlationId);
-  res.setHeader('x-process-time', processTime);
-  const rawResponse = res.write;
-  const rawResponseEnd = res.end;
-  const chunks = [];
-  res.write = (...args) => {
-    const restArgs = [];
-    for (let i = 0; i < args.length; i++) {
-      restArgs[i] = args[i];
-    }
-    chunks.push(Buffer.from(restArgs[0]));
-    rawResponse.apply(res, restArgs);
-  };
-  res.end = (...args) => {
-    const restArgs = [];
-    for (let i = 0; i < args.length; i++) {
-      restArgs[i] = args[i];
-    }
-    if (restArgs[0]) {
-      chunks.push(Buffer.from(restArgs[0]));
-    }
-    const body = Buffer.concat(chunks).toString('utf8');
-    const responseLog = {
-      timestamp: new Date(elapsedEnd).toISOString(),
-      correlationId: req.correlationId,
-      level: LogLevel.DEBUG,
-      message: `HTTP Response - ${processTime}`,
-      data: {
-        req: {
-          body: req.body,
-          headers: req.headers,
-        },
-        res: {
-          body: tryParseJsonString(body),
-          headers: res.getHeaders(),
-        },
-        statusCode: res.statusCode,
-        // clientIP:
-        //   req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-        method: req.method,
-        originalUri: req.originalUrl,
-        uri: req.url,
-        // referer: req.headers.referer || '',
-        // userAgent: req.headers['user-agent'],
-        processTime,
-      },
-    };
-    log(LogLevel.DEBUG, responseLog);
-    rawResponseEnd.apply(res, restArgs);
-  };
-};
+function shouldLogResponseBody(req, res): boolean {
+  const contentType = String(res.getHeader('content-type') || '');
+
+  // Don't log binary content
+  if (
+    contentType.includes('image/') ||
+    contentType.includes('audio/') ||
+    contentType.includes('video/') ||
+    contentType.includes('application/octet-stream')
+  ) {
+    return false;
+  }
+
+  // Skip large responses to avoid bloating logs
+  const contentLength = Number(res.getHeader('content-length') || 0);
+  if (contentLength > 10240) {
+    // Skip if > 10KB
+    return false;
+  }
+
+  return true;
+}
