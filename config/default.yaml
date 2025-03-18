@@ -23,4 +23,4 @@ pino:
       - req.headers["access-token"]
 
 logger:
-  enabled: false
+  enabled: true
