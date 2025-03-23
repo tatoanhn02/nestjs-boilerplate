@@ -1,6 +1,6 @@
-<p align="center">A NestJS base project with structured environment configuration.</p>
-
 # NestJS Boilerplate
+
+<p align="center">A NestJS base project with structured environment configuration.</p>
 
 ## Description
 
@@ -56,9 +56,9 @@ The project uses **YAML-based configuration** to manage different environments a
 
 #### Environment Files
 
-- **\`config/default.yaml\`** → Contains default configuration for development.
-- **\`config/custom-environment-variables.yaml\`** → Maps environment variables dynamically.
-- **\`config/services/\`** → Contains configurations for **microservices and third-party services**.
+- **`config/default.yaml`** → Contains default configuration for development.
+- **`config/custom-environment-variables.yaml`** → Maps environment variables dynamically.
+- **`config/services/`** → Contains configurations for **microservices and third-party services**.
 
 ## Code Quality
 
@@ -77,7 +77,7 @@ The project uses Jest for testing and mongodb-memory-server for an in-memory dat
 
 ## Project Structure
 
-\`\`\`
+```
 nestjs-base/
 │── src/
 │   ├── modules/       # Feature modules
@@ -87,13 +87,12 @@ nestjs-base/
 │   ├── services/      # Microservices & third-party service configurations
 │   ├── custom-environment-variables.yaml  # Env mapping
 │   ├── default.yaml   # Default environment settings
-│── test/              # Test cases
 │── package.json       # Project dependencies & scripts
 │── README.md          # Project documentation
-\`\`\`
+```
 
 ## Author
 
-**toantv**
-Contact: [tatoanhn02@gmail.com](mailto:tatoanhn02@gmail.com)
+**toantv**  
+Contact: [tatoanhn02@gmail.com](mailto:tatoanhn02@gmail.com)  
 GitHub: [tatoanhn02](https://github.com/tatoanhn02)

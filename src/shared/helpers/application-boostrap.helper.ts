@@ -6,6 +6,7 @@ import {
   LoggerInterceptor,
   setCorrelationId,
 } from '../../interceptors/logger.interceptor';
+import { HttpExceptionFilter } from '../filters/http-exception.filter';
 
 export const setupApplication = async (
   app: INestApplication,
@@ -15,4 +16,6 @@ export const setupApplication = async (
 
   app.useGlobalInterceptors(new LoggerInterceptor());
   app.use(setCorrelationId);
+
+  app.useGlobalFilters(new HttpExceptionFilter());
 };
