@@ -30,7 +30,7 @@ export class User {
     type: String,
     default: null,
   })
-  socialId?: string | null;
+  socialId: string | null;
 
   @Prop({
     enum: EUserStatus,
@@ -46,6 +46,9 @@ export class User {
 
   @Prop({ type: Date, default: null })
   lockUntil: Date | null;
+
+  @Prop({ type: Date, default: null })
+  lastLogin: Date | null;
 
   @Prop({
     ref: Role.name,
