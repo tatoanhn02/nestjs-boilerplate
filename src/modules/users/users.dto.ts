@@ -1,6 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
+  ArrayMinSize,
+  IsArray,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -8,6 +10,7 @@ import {
   IsString,
   Matches,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
 
 import { EUserStatus } from './users.enum';
@@ -81,4 +84,27 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   role?: string;
+}
+
+export class CreateBulkUsersDto {
+  @ApiProperty({
+    type: [CreateUserDto],
+    isArray: true,
+    description: 'users info to create',
+    example: [
+      {
+        email: 'test@example.com',
+        password: '',
+        firstName: '',
+        lastName: '',
+        role: '',
+      },
+    ],
+  })
+  @IsNotEmpty()
+  @IsArray()
+  @Type(() => CreateUserDto)
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  users: CreateUserDto[];
 }

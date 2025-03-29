@@ -1,0 +1,70 @@
+service:
+  name: SERVICE_NAME
+  baseUrl: SERVICE_BASE_URL
+  docsBaseUrl: SERVICE_DOCS_BASE_URL
+  appVersion: SERVICE_API_VERSION
+
+server:
+  port: SERVER_PORT
+  host: SERVER_HOST
+  hostname: SERVER_HOSTNAME
+
+mongodb:
+  uri: MONGODB_URI
+
+logger:
+  level: LOGGER_LEVEL
+  enabled:
+    __name: LOGGER_ENABLED
+    __format: json
+  redact:
+    enabled:
+      __name: LOGGER_REDACT_ENABLED
+      __format: json
+    paths:
+      __name: LOGGER_REDACT_PATHS
+      __format: json
+    censor: LOGGER_REDACT_CENSOR
+
+jwt:
+  expiresIn: JWT_EXPIRES_IN
+  forgotExpiresIn: 1D
+  forgotSecret: 6e85d5bb278c61277f2bff554d46e1a9104bf9d9cc84809abd79f21f645ff8cfe0a39ee6979958dfbd390cf3114193fff3e4572fa92ef73fd632e8e85ba8fa63
+  refreshExpiresIn: JWT_REFRESH_EXPIRES_IN
+  refreshSecret: JWT_REFRESH_SECRET
+  secret: JWT_SECRET
+
+redis:
+  host: REDIS_HOST
+  port: REDIS_PORT
+  options:
+    __name: REDIS_OPTIONS
+    __format: json
+  cluster:
+    nodes:
+      __name: REDIS_CLUSTER_NODES
+      __format: json
+    options:
+      __name: REDIS_CLUSTER_OPTIONS
+      __format: json
+  redisQueueUsers: REDIS_QUEUE_USERS
+
+user:
+  maxFailedAttempts: USER_MAX_FAILED_ATTEMPTS
+  lockDurationMinutes: USER_LOCK_DURATION_MINUTES
+  initialEmail: USER_INITIAL_EMAIL
+  initialPassword: USER_INITIAL_PASSWORD
+  initialRole: USER_INITIAL_ROLE
+
+mailer:
+  host: MAILER_HOST
+  ignoreTLS: MAILER_IGNORE_TLS
+  port: MAILER_PORT
+  secure: MAILER_SECURE
+  requireTLS: MAILER_REQUIRE_TLS
+
+aws:
+  accessKey: AWS_ACCESS_KEY
+  secretAccessKey: AWS_SECRET_KEY
+  s3bucket: AWS_S3_BUCKET
+  s3Region: AWS_S3_REGION

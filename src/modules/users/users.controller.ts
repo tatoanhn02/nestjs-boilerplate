@@ -1,14 +1,22 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Patch,
   Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { EApiTags } from 'src/shared/enums/api-tags.enum';
 
 import {
@@ -16,7 +24,12 @@ import {
   IPagination,
 } from '../../shared/interfaces/pagination.interface';
 import { Pagination } from '../../shared/validation-decorators/pagination.decorator';
-import { CreateUserDto, GetUsersDto } from './users.dto';
+import {
+  CreateBulkUsersDto,
+  CreateUserDto,
+  GetUsersDto,
+  UpdateUserDto,
+} from './users.dto';
 import { UsersService } from './users.service';
 
 @ApiTags(EApiTags.USER)
@@ -48,5 +61,43 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   async createUser(@Body() createUserDto: CreateUserDto) {
     return this.usersService.createUser(createUserDto);
+  }
+
+  @Patch(':id/update')
+  @ApiOperation({
+    operationId: 'updateUser',
+    description: 'to update user',
+  })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    type: String,
+  })
+  @HttpCode(HttpStatus.OK)
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.usersService.updateUser(id, updateUserDto);
+  }
+
+  @Delete(':id/delete')
+  @ApiOperation({
+    operationId: 'deleteUser',
+    description: 'to delete user',
+  })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    type: String,
+  })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteUser(@Param('id') id: string) {
+    return this.usersService.deleteUser(id);
+  }
+
+  @Post('create-bulk-users')
+  async createBulkUsers(@Body() createBulkUsersDto: CreateBulkUsersDto) {
+    return this.usersService.createBulkUsers(createBulkUsersDto);
   }
 }

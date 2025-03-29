@@ -5,6 +5,7 @@ import { PaginationHeaderHelper } from '../../shared/helpers/pagination.helper';
 import { RoleRepository } from '../roles/roles.repository';
 import { Role, RoleSchema } from '../roles/roles.schema';
 import { UsersController } from './users.controller';
+import { UsersQueue } from './users.queue';
 import { UserRepository } from './users.repository';
 import { User, UserSchema } from './users.schema';
 import { UsersService } from './users.service';
@@ -22,6 +23,8 @@ import { UsersService } from './users.service';
     UsersService,
     UserRepository,
     RoleRepository,
+    UsersQueue,
   ],
+  exports: [UsersService],
 })
 export class UsersModule {}
