@@ -12,15 +12,48 @@ server:
 mongodb:
   uri: mongodb://127.0.0.1:27017/nestjs-base
 
-pino:
+logger:
   level: debug
   enabled: true
-  autoLogging: false # to disable the automatic "request completed" and "request errored" logging
+  autoLogging: false
   redact:
     enabled: true
     censor: '******'
     paths:
       - req.headers["access-token"]
 
-logger:
-  enabled: true
+jwt:
+  expiresIn: 1D
+  forgotExpiresIn: 1D
+  forgotSecret: 6e85d5bb278c61277f2bff554d46e1a9104bf9d9cc84809abd79f21f645ff8cfe0a39ee6979958dfbd390cf3114193fff3e4572fa92ef73fd632e8e85ba8fa63
+  refreshExpiresIn: 1W
+  refreshSecret: fc6ded445aea3db5aca63c1286965685c683cf268f023723a7748ebfc4629a32af2cdd136154e965b3621c3f49ea117707833a829398c0c4a2ba612c16d97bf3
+  secret: dd49b66dd6623cc4292ddaab99d318371ec539956828683875e0f8beaec3d70a2c72ed96e8329513feb558a33738ecbb20c0dde685424a6ce274d2888c820912
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  options:
+    nodes:
+    options:
+  redisQueueUsers: redis-queue-users
+
+user:
+  maxFailedAttempts: 10
+  lockDurationMinutes: 30
+  initialEmail: test@email.com
+  initialPassword: Supersecretpassword@123
+  initialRole: SYSTEM_ADMIN
+
+mailer:
+  host: localhost
+  ignoreTLS:
+  port: 1025
+  secure:
+  requireTLS:
+
+aws:
+  accessKey:
+  secretAccessKey:
+  s3bucket:
+  s3Region:

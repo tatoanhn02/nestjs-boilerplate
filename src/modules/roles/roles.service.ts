@@ -13,7 +13,7 @@ import {
 } from '../../shared/interfaces/pagination.interface';
 import { CreateRoleDto, GetRolesDto, UpdateRoleDto } from './roles.dto';
 import { RoleRepository } from './roles.repository';
-import { Role } from './roles.schema';
+import { Role, RoleDocument } from './roles.schema';
 
 @Injectable()
 export class RolesService {
@@ -22,7 +22,7 @@ export class RolesService {
     private readonly roleRepository: RoleRepository,
   ) {}
 
-  async createRole(createRoleDto: CreateRoleDto): Promise<Role> {
+  async createRole(createRoleDto: CreateRoleDto): Promise<RoleDocument> {
     const existingRole = await this.roleRepository.findOne({
       name: createRoleDto.name,
     });

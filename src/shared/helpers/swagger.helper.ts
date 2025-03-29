@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as config from 'config';
+import config from 'config';
 
 import { SERVICE_DOCS_BASE_URL } from '../../config/config.provider';
 

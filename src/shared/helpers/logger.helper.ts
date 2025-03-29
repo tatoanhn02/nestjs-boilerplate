@@ -1,6 +1,6 @@
 import pino from 'pino';
 
-import { PINO_ENABLED, pinoConfig } from '../../config/config.provider';
+import { LOGGER_ENABLED, pinoConfig } from '../../config/config.provider';
 import { getCorrelationId } from '../../interceptors/logger.interceptor';
 import { tryParseJsonString } from './data.helper';
 
@@ -31,7 +31,7 @@ interface LogDetails {
 }
 
 const log = (logLevel: LogLevel, { data, message, methodName }: LogDetails) => {
-  if (!PINO_ENABLED) return;
+  if (!LOGGER_ENABLED) return;
 
   const logFunc = logMethods[logLevel];
   if (!logFunc) {
@@ -65,7 +65,7 @@ export const errorLog = (
 };
 
 export const httpRequestLog = (req): void => {
-  if (!PINO_ENABLED) return;
+  if (!LOGGER_ENABLED) return;
 
   const requestData = {
     correlationId: req.correlationId,
@@ -87,7 +87,7 @@ export const httpRequestLog = (req): void => {
 };
 
 export const httpResponseLog = (req, res): void => {
-  if (!PINO_ENABLED) return;
+  if (!LOGGER_ENABLED) return;
 
   const startTime = req.timestamp || Date.now();
   const chunks: Buffer[] = [];
@@ -125,7 +125,7 @@ export const httpResponseLog = (req, res): void => {
       responseBody = Buffer.concat(chunks).toString('utf8');
       responseBody = tryParseJsonString(responseBody);
     } catch (err) {
-      responseBody = '[Error parsing response body]';
+      responseBody = `[Error parsing response body] ${err}`;
     }
 
     // Log response details

@@ -12,7 +12,7 @@ server:
 mongodb:
   uri: mongodb://127.0.0.1:27017/nestjs-base
 
-pino:
+logger:
   level: debug
   enabled: true
   autoLogging: false # to disable the automatic "request completed" and "request errored" logging
