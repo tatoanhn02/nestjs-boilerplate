@@ -82,6 +82,7 @@ export class AuthService {
       hash,
       id: user.id,
       isAdmin: true,
+      email: user.email,
     });
 
     return {
@@ -100,6 +101,7 @@ export class AuthService {
         {
           id: data.id,
           isAdmin: data.isAdmin,
+          email: data.email,
         },
         {
           expiresIn: JWT_EXPIRES_IN,

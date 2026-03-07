@@ -151,6 +151,14 @@ export class UsersService {
     return this.userRepository.updateById(id, updateUserDto);
   }
 
+  async getUsersOnline() {
+    const usersOnline = await this.userRepository.find(
+      { status: EUserStatus.ACTIVE },
+      { select: '_id firstName lastName email' },
+    );
+    return usersOnline;
+  }
+
   private async generatePassword(password: string) {
     const salt = await bcrypt.genSalt();
     return await bcrypt.hash(password, salt);
@@ -158,9 +166,6 @@ export class UsersService {
 
   private buildFindParams(filters: GetUsersDto): Record<string, any> {
     return {
-      ...(filters?.name && {
-        name: { $regex: escapeRegex(filters.name), $options: 'i' },
-      }),
       ...(filters?.name && {
         $or: [
           {
@@ -171,6 +176,12 @@ export class UsersService {
           },
           {
             lastName: {
+              $regex: escapeRegex(filters.name),
+              $options: 'i',
+            },
+          },
+          {
+            email: {
               $regex: escapeRegex(filters.name),
               $options: 'i',
             },

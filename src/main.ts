@@ -13,7 +13,7 @@ import { infoLog } from './shared/helpers/logger.helper';
 import { initializeSwagger } from './shared/helpers/swagger.helper';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
 
   await setupApplication(app);
   await initializeSwagger(app);

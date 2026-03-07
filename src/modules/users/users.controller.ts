@@ -100,4 +100,9 @@ export class UsersController {
   async createBulkUsers(@Body() createBulkUsersDto: CreateBulkUsersDto) {
     return this.usersService.createBulkUsers(createBulkUsersDto);
   }
+
+  @Get('users-online')
+  async getUsersOnline() {
+    return this.usersService.getUsersOnline();
+  }
 }
