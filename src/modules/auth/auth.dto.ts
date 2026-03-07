@@ -23,4 +23,5 @@ export class TokenData {
   id: string;
   isAdmin: boolean;
   hash: string;
+  email: string;
 }
