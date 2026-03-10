@@ -9,8 +9,8 @@ services:
     depends_on:
       - redis
       - mongodb
-    environment:
-      - MONGODB_URI=mongodb://mongodb:27017/nestjs-base
+    env_file:
+      - .env
     networks:
       - backend-network
 
